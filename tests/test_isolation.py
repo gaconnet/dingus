@@ -32,6 +32,20 @@ class WhenPatchingObjects:
             assert str(urllib2.urlopen) == '<Dingus urllib2.urlopen>'
 
 
+class WhenPatchingMissingObjects:
+    @patch('urllib2.missing_object')
+    def should_create_object_with_dingus(self):
+        assert isinstance(urllib2.missing_object, Dingus)
+
+    def should_delete_object_after_patched_function_exits(self):
+        @patch('urllib2.missing_object')
+        def patch_urllib2():
+            pass
+        assert not hasattr(urllib2, 'missing_object')
+        patch_urllib2()
+        assert not hasattr(urllib2, 'missing_object')
+
+
 class WhenIsolating:
     def should_isolate(self):
         @isolate("os.popen")

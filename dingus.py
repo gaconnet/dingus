@@ -54,6 +54,8 @@ class NoReturnValue(object):
     pass
 class NoArgument(object):
     pass
+class NoAttribute(object):
+    pass
 
 
 def patch(object_path, new_object=NoArgument):
@@ -89,11 +91,15 @@ class _Patcher:
         self.restore_object()
 
     def patch_object(self):
-        self.original_object = getattr(self.module, self.attribute_name)
+        self.original_object = getattr(self.module, self.attribute_name,
+                                       NoAttribute)
         setattr(self.module, self.attribute_name, self.new_object)
 
     def restore_object(self):
-        setattr(self.module, self.attribute_name, self.original_object)
+        if self.original_object is NoAttribute:
+            delattr(self.module, self.attribute_name)
+        else:
+            setattr(self.module, self.attribute_name, self.original_object)
 
 
 def isolate(object_path):
